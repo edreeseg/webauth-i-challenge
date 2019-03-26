@@ -11,7 +11,7 @@ const session = require('express-session');
 
 server.use(session({
     name: 'testSession',
-    secret: 'Tell me what thy lordly name is on the night\'s plutonian shore',
+    secret: 'Tell me what thy lordly name is on the Night\'s Plutonian shore',
     cookie: {
         maxAge: 1 * 24 * 60 * 60 * 1000,
         secure: false, // Would be true to restrict to https, but cannot test with Postman while set to true.
