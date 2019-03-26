@@ -3,6 +3,7 @@ const server = express();
 const knex = require('knex');
 const knexConfig = require('./knexfile');
 const db = knex(knexConfig.development);
+const cors = require('cors');
 
 const port = process.env.PORT || 5000;
 const bcrypt = require('bcryptjs');
@@ -19,6 +20,11 @@ server.use(session({
     resave: false,
     saveUninitialized: false,
 }));
+const corsOptions = {
+    credentials: true,
+    origin: 'http://localhost:3000', // Obviously changed for prod
+}
+server.use(cors(corsOptions));
 server.use(express.json());
 server.use('/api/restricted', restrictAccess);
 
