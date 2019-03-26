@@ -20,6 +20,12 @@ server.use(session({
     saveUninitialized: false,
 }));
 server.use(express.json());
+server.use('/api/restricted', restrictAccess);
+
+function restrictAccess(req, res, next){
+    if (req.session && req.session.username) next()
+    else res.status(401).json({ message: 'You shall not pass!' });
+}
 
 server.post('/api/register', (req, res) => { // Promise syntax
     const { username, password, email, firstName, lastName } = req.body;
@@ -31,7 +37,7 @@ server.post('/api/register', (req, res) => { // Promise syntax
     db('users')
         .insert(credentials)
         .then(id => {
-            req.session.name = username;
+            req.session.username = username;
             res.status(201).json({ id: id[0] });
         })
         .catch(error => {
@@ -55,7 +61,7 @@ server.post('/api/login', async (req, res) => { // Async/await
         user = user[0];
         if (!user || !bcrypt.compareSync(credentials.password, user.password)) 
             return res.status(401).json({ error: 'You shall not pass!' });
-        req.session.name = user.username;
+        req.session.username = user.username;
         res.json({ success: `Welcome, ${user.firstName}.` });
     }
     catch (error) {
@@ -65,7 +71,7 @@ server.post('/api/login', async (req, res) => { // Async/await
 
 server.get('/api/users', async (req, res) => {
     try {
-        if (req.session.name){
+        if (req.session.username){
             const result = await db('users');
             const users = result.map(x => {
                 const { password, ...noPassword } = x;
